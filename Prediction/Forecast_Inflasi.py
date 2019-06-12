@@ -44,6 +44,7 @@ def forecast(timeSeries,chrom):
     sgd = SGD(lr, decay, momentum, nesterov=False)
     #https://towardsdatascience.com/hyper-parameter-tuning-techniques-in-deep-learning-4dad592c63c8
     
+    print("Start model building")
     model = Sequential()
     model.add(InputLayer(input_shape=(1, seasons), name="input"))
     model.add(LSTM(4, name="hidden", activation='sigmoid', use_bias = True, bias_initializer='ones'))
@@ -59,7 +60,8 @@ def forecast(timeSeries,chrom):
         batch_size=1,
         verbose=0,
         validation_data=(X_val, y_val));
-
+    print("Finish model building")
+    print("Start predict")
     yhat_train = model.predict(X_train[::seasons])
     yhat_val = model.predict(X_val[::seasons])
     yhat_test = model.predict(X_test[::seasons])
@@ -71,7 +73,8 @@ def forecast(timeSeries,chrom):
     y_train_unscaled = scaler.inverse_transform(y_train[::seasons]).flatten()
     y_val_unscaled = scaler.inverse_transform(y_val[::seasons]).flatten()
     y_test_unscaled = scaler.inverse_transform(y_test[::seasons]).flatten()
-
+    print("Finish predict")
+    
     #mae = mean_absolute_error(y_test_unscaled, yhat_test_unscaled)
     mse = mean_squared_error(y_test_unscaled, yhat_test_unscaled)
     #r2 = r2_score(y_test_unscaled, yhat_test_unscaled)
