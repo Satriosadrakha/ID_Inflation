@@ -102,7 +102,7 @@ def prosesGA(timeSeries, pop, chromosome):
 #     print("Parent: " + str(parent))
 #     print("Index: " + str(index))
     
-    for i in range(pop-1,9,-1):
+    for i in range(0,pop/2):
         parent.append(sorted_merged[i][0])
 #     print("Parent = " + str(parent))
 #     for x in range(0, pop/2):
