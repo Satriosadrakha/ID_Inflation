@@ -1,5 +1,6 @@
 from keras import backend as K
-from keras.layers import InputLayer, Dense, LSTM
+K.set_image_dim_ordering('th')
+from keras.layers import InputLayer, Dense, LSTM, Flatten
 from keras.models import Sequential
 from keras.optimizers import SGD
 from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
@@ -45,22 +46,40 @@ def forecast(timeSeries,chrom):
     #https://towardsdatascience.com/hyper-parameter-tuning-techniques-in-deep-learning-4dad592c63c8
     
     print("Start model building")
+#     input_shape = tfidf_matrix[0].shape
+    
     model = Sequential()
     model.add(InputLayer(input_shape=(1, seasons), name="input"))
     model.add(LSTM(4, name="hidden", activation='sigmoid', use_bias = True, bias_initializer='ones'))
+#     print("LSTM secure")
     model.add(Dense(seasons, name="output", activation='linear', use_bias = True, bias_initializer='ones'))
     model.compile(loss='mean_squared_error',
-                  optimizer=sgd,
-                  metrics=["mae", "mse", r2_metric, theils_u_metric])
-    
-    num_of_epochs = 10
+              optimizer=sgd,
+              metrics=["mae", "mse", r2_metric, theils_u_metric])
+    num_of_epochs = 5
     history = model.fit(
         X_train, y_train,
         epochs=num_of_epochs,
         batch_size=1,
-        verbose=0,
+        verbose=1,
         validation_data=(X_val, y_val));
-    print("Finish model building")
+#     model = Sequential()
+#     model.add(InputLayer(input_shape=(1, seasons), name="input"))
+#     model.add(LSTM(4, name="hidden", activation='sigmoid', use_bias = True, bias_initializer='ones'))
+# #     model.add(Flatten())
+#     model.add(Dense(seasons, name="output", activation='linear', use_bias = True, bias_initializer='ones'))
+#     model.compile(loss='mean_squared_error',
+#                   optimizer=sgd,
+#                   metrics=["mae", "mse", r2_metric, theils_u_metric])
+    
+#     num_of_epochs = 5
+#     history = model.fit(
+#         X_train, y_train,
+#         epochs=num_of_epochs,
+#         batch_size=1,
+#         verbose=0,
+#         validation_data=(X_val, y_val));
+#     print("Finish model building")
     print("Start predict")
     yhat_train = model.predict(X_train[::seasons])
     yhat_val = model.predict(X_val[::seasons])
@@ -73,8 +92,8 @@ def forecast(timeSeries,chrom):
     y_train_unscaled = scaler.inverse_transform(y_train[::seasons]).flatten()
     y_val_unscaled = scaler.inverse_transform(y_val[::seasons]).flatten()
     y_test_unscaled = scaler.inverse_transform(y_test[::seasons]).flatten()
-    print("Finish predict")
-    
+#     print("Finish predict")
+
     #mae = mean_absolute_error(y_test_unscaled, yhat_test_unscaled)
     mse = mean_squared_error(y_test_unscaled, yhat_test_unscaled)
     #r2 = r2_score(y_test_unscaled, yhat_test_unscaled)
